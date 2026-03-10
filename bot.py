@@ -15,7 +15,7 @@ OPENROUTER_API_KEY = os.environ.get("sk-or-v1-5f681ab00b25db9d8ba749b8b6bbddbdf2
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 # Проверка, что ключи загружены
-if not TELEGRAM_TOKEN:
+if not TELEGRAM_BOT_TOKEN:
     raise ValueError("Нет TELEGRAM_BOT_TOKEN!")
 if not OPENROUTER_API_KEY:
     raise ValueError("Нет OPENROUTER_API_KEY!")
@@ -94,4 +94,5 @@ def main():
 if __name__ == "__main__":
 
     main()
+
 
