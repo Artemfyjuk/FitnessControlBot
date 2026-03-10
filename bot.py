@@ -10,7 +10,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 
 # Токены и ключи читаются из переменных окружения (их мы зададим позже на Railway)
-TELEGRAM_TOKEN = os.environ.get("8737321338:AAErJRWJkRI0-Skig9n8WOLbgFilXvXJ9mM")
+TELEGRAM_BOT_TOKEN = os.environ.get("8737321338:AAErJRWJkRI0-Skig9n8WOLbgFilXvXJ9mM")
 OPENROUTER_API_KEY = os.environ.get("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")
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
@@ -94,3 +94,4 @@ def main():
 if __name__ == "__main__":
 
     main()
+
