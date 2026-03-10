@@ -10,8 +10,8 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 
 # Токены и ключи читаются из переменных окружения (их мы зададим позже на Railway)
-TELEGRAM_TOKEN = os.environ.get("8737321338:AAHLUIdLjttIY-kIXgSjNk5xoShawqVMlXg")
-OPENROUTER_API_KEY = os.environ.get("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")
+TELEGRAM_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
+OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY")
 
 if not TELEGRAM_TOKEN:
     raise ValueError("Нет TELEGRAM_BOT_TOKEN!")
@@ -92,6 +92,7 @@ def main():
 if __name__ == "__main__":
 
     main()
+
 
 
 
