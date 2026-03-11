@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 # Токены и ключи читаются из переменных окружения (их мы зададим позже на Railway)
 TELEGRAM_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY")
+OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 if not TELEGRAM_TOKEN:
     raise ValueError("Нет TELEGRAM_BOT_TOKEN!")
@@ -92,6 +93,7 @@ def main():
 if __name__ == "__main__":
 
     main()
+
 
 
 
