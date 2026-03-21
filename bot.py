@@ -37,7 +37,66 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # Собираем историю сообщений (если есть)
     history = context.user_data.get("history", [])
-    
+
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_message = update.message.text
+
+    await context.bot.send_chat_action(chat_id=update.effective_chat.id, action="typing")
+
+    # Получаем историю
+    history = context.user_data.get("history", [])
+
+    # Системный промпт
+    SYSTEM_PROMPT = {
+        "role": "system",
+        "content": (
+            "Ты — профессиональный консультант по питанию и здоровому образу жизни. "
+            "Отвечай дружелюбно, давай полезные советы по питанию, учитывай индивидуальные особенности. "
+            "Если пользователь спрашивает не о питании, вежливо направляй его обратно к теме. "
+            "Не давай медицинских диагнозов, всегда рекомендуй консультацию со специалистом при серьёзных вопросах."
+        )
+    }
+
+    # Вставляем системное сообщение, если его нет в начале
+    if not history or history[0].get("role") != "system":
+        history.insert(0, SYSTEM_PROMPT)
+
+    # Добавляем новое сообщение пользователя
+    history.append({"role": "user", "content": user_message})
+
+    # Ограничиваем длину истории
+    if len(history) > 10:
+        history = history[-10:]
+
+    # Запрос к OpenRouter
+    payload = {
+        "model": "deepseek/deepseek-chat",
+        "messages": history
+    }
+
+    headers = {
+        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+        "Content-Type": "application/json"
+    }
+
+    try:
+        response = requests.post(OPENROUTER_URL, json=payload, headers=headers)
+        response.raise_for_status()
+        data = response.json()
+        reply = data['choices'][0]['message']['content']
+
+        history.append({"role": "assistant", "content": reply})
+        context.user_data["history"] = history
+
+        await update.message.reply_text(reply)
+
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Ошибка при запросе к OpenRouter: {e}")
+        await update.message.reply_text("Произошла ошибка при обращении к нейросети. Попробуй позже.")
+    except (KeyError, IndexError, json.JSONDecodeError) as e:
+        logger.error(f"Ошибка парсинга ответа: {e}")
+        await update.message.reply_text("Получен странный ответ от нейросети. Попробуй ещё раз.")
+        
     # Добавляем новое сообщение пользователя в историю
     history.append({"role": "user", "content": user_message})
 
