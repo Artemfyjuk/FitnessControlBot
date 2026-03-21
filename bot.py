@@ -32,14 +32,11 @@ async def clear(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_message = update.message.text
 
-    # Покажем, что бот печатает (чтобы пользователь ждал)
-    await context.bot.send_chat_action(chat_id=update.effective_chat.id, action="typing")
-
-    # Собираем историю сообщений (если есть)
-    history = context.user_data.get("history", [])
-
-async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_message = update.message.text
+    # Защита от дублирования
+    last_msg_id = context.user_data.get("last_message_id")
+    if update.message.message_id == last_msg_id:
+        return
+    context.user_data["last_message_id"] = update.message.message_id
 
     await context.bot.send_chat_action(chat_id=update.effective_chat.id, action="typing")
 
@@ -48,26 +45,27 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # Системный промпт
     SYSTEM_PROMPT = {
-    "role": "system",
-    "content": (
-        "Ты — профессиональный консультант по питанию и здоровому образу жизни. "
-        "Отвечай дружелюбно, давай полезные советы по питанию, учитывай индивидуальные особенности. "
-        "Если пользователь спрашивает не о питании, вежливо направляй его обратно к теме. "
-        "Не давай медицинских диагнозов, всегда рекомендуй консультацию со специалистом при серьёзных вопросах.\n\n"
-        "ВАЖНО: не используй в ответах markdown, звездочки, подчеркивания и другие символы форматирования. "
-        "Отвечай обычным текстом без выделений."
-    )
-}
-    # Вставляем системное сообщение, если его нет в начале
+        "role": "system",
+        "content": (
+            "Ты — профессиональный консультант по питанию и здоровому образу жизни. "
+            "Отвечай дружелюбно, давай полезные советы по питанию, учитывай индивидуальные особенности. "
+            "Если пользователь спрашивает не о питании, вежливо направляй его обратно к теме. "
+            "Не давай медицинских диагнозов, всегда рекомендуй консультацию со специалистом при серьёзных вопросах.\n\n"
+            "ВАЖНО: не используй в ответах markdown, звездочки, подчеркивания и другие символы форматирования. "
+            "Отвечай обычным текстом без выделений."
+        )
+    }
+
     if not history or history[0].get("role") != "system":
         history.insert(0, SYSTEM_PROMPT)
 
-    # Добавляем новое сообщение пользователя
     history.append({"role": "user", "content": user_message})
 
     # Ограничиваем длину истории
     if len(history) > 10:
         history = history[-10:]
+
+    # ... остальной код (запрос к OpenRouter и отправка ответа) ...
 
     # Запрос к OpenRouter
     payload = {
